@@ -2,3 +2,8 @@ install git
 install docker.io and docker-compose
 prepare docker-compose.yml
 create docker network using [docker network create pos-network]
+run docker-compose command [docker-compose up -d]
+check docker container status [docker ps -a]
+if running and healty, go to browser and fetch URL [http://<server>:5050]
+pgadmin (postgressSQL UI) opens up
+enter pgadmin creds and add db server inside for manual configuration
