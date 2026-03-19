@@ -1,0 +1,5 @@
+git
+prepare directory structure
+install dependencies [pip install fastapi uvicorn sqlalchemy psycopg2-binary python-jose passlib[bcrypt] redis celery pydantic]
+
+

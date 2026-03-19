@@ -1,0 +1,47 @@
+pos-backend/
+│
+├── app/
+│   ├── main.py
+│   │
+│   ├── core/
+│   │   ├── config.py
+│   │   └── security.py
+│   │
+│   ├── db/
+│   │   ├── base.py
+│   │   ├── session.py
+│   │   └── init_db.py
+│   │
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── tenant.py
+│   │   ├── user.py
+│   │   ├── customer.py
+│   │   ├── product.py
+│   │   ├── order.py
+│   │   └── order_item.py
+│   │
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── order.py
+│   │
+│   ├── api/
+│   │   ├── deps.py
+│   │   └── routes/
+│   │       ├── __init__.py
+│   │       └── orders.py
+│   │
+│   ├── services/
+│   │   ├── notification.py
+│   │   └── billing.py
+│   │
+│   └── utils/
+│       └── helpers.py
+│
+├── worker/
+│   ├── celery_app.py
+│   └── tasks.py
+│
+├── requirements.txt
+├── Dockerfile
+└── .env
