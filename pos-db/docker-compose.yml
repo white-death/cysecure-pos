@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: pos-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - pos_pg_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - pos-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pos-pgadmin
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${PGADMIN_PORT}:80"
+    networks:
+      - pos-network
+    depends_on:
+      - db
+    entrypoint: ["/entrypoint.sh"]
+
+volumes:
+  pos_pg_data:
+
+networks:
+  pos-network:
+    external: true

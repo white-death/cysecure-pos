@@ -1,0 +1,4 @@
+install git
+install docker.io and docker-compose
+prepare docker-compose.yml
+create docker network using [docker network create pos-network]
