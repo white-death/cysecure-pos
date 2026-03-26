@@ -1,10 +1,14 @@
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt
-from app.core.config import settings
-from app.db.session import SessionLocal
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
 
-# ---------------- DB Dependency ----------------
+from app.core.oidc import verify_token
+from app.db.session import SessionLocal
+from app.models.user import User
+
+security = HTTPBearer()
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -13,27 +17,25 @@ def get_db():
         db.close()
 
 
-# ---------------- Auth ----------------
-
-security = HTTPBearer()
-
-
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    credentials=Depends(security),
+    db: Session = Depends(get_db)
 ):
-    token = credentials.credentials
+    payload = verify_token(credentials.credentials)
 
-    try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=["HS256"])
-        return payload
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+    keycloak_id = payload.get("sub")
+
+    user = db.query(User).filter(
+        User.keycloak_id == keycloak_id
+    ).first()
+
+    if not user:
+        raise HTTPException(403, "User not registered by admin")
+
+    return user
 
 
-# ---------------- Role-Based Access ----------------
-def require_role(required_roles: list):
-    def role_checker(user=Depends(get_current_user)):
-        if user["role"] not in required_roles:
-            raise HTTPException(status_code=403, detail="Forbidden")
-        return user
-    return role_checker
+def require_admin(user=Depends(get_current_user)):
+    if user.role != "admin":
+        raise HTTPException(403, "Admin only")
+    return user

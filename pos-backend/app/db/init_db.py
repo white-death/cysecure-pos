@@ -1,9 +1,9 @@
-from app.db.base import Base
 from app.db.session import engine
+from app.db.base import Base
 
-# VERY IMPORTANT: import models
-from app.models import User
-from app.models.refresh_token import RefreshToken
+# IMPORTANT: import models so tables are registered
+from app.models import user
+
 
 def init_db():
     Base.metadata.create_all(bind=engine)

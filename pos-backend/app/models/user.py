@@ -6,9 +6,9 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(String, primary_key=True)  # ENXU2026000001
+    keycloak_id = Column(String, unique=True, index=True)
     name = Column(String, nullable=False)
     phone = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
 
     role = Column(String, nullable=False)  # admin, cashier, manager
 
