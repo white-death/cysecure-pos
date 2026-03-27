@@ -2,12 +2,13 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.schemas.user import CreateUserRequest
 from app.api.deps import require_admin, get_db
 from app.models.user import User
-from app.utils.id_generator import generate_user_id
+from app.utils.id_generator import generate_enxu_id
 from app.core.config import settings
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter()
 
 
 # -------------------------------
@@ -38,14 +39,12 @@ def get_admin_token():
 def ensure_role(token: str, role_name: str):
     url = f"{settings.KEYCLOAK_URL}/admin/realms/{settings.KEYCLOAK_REALM}/roles"
 
-    # Check existing roles
     res = requests.get(url, headers={"Authorization": f"Bearer {token}"})
     roles = res.json()
 
     if any(r["name"] == role_name for r in roles):
         return
 
-    # Create role if not exists
     requests.post(
         url,
         headers={"Authorization": f"Bearer {token}"},
@@ -78,7 +77,7 @@ def assign_role(token: str, user_id: str, role_name: str):
 # -------------------------------
 @router.post("/create-user")
 def create_user(
-    data: dict,
+    data: CreateUserRequest,
     db: Session = Depends(get_db),
     admin=Depends(require_admin)
 ):
@@ -86,16 +85,14 @@ def create_user(
     Admin creates a user:
     - Creates user in Keycloak
     - Assigns role in Keycloak
-    - Stores user in DB
+    - Stores full profile in DB
     """
 
-    required_fields = ["name", "phone", "password", "role", "location"]
+    default_password = "Temp@123"
 
-    for field in required_fields:
-        if field not in data:
-            raise HTTPException(status_code=400, detail=f"{field} is required")
-
+    # -------------------------------
     # Get admin token
+    # -------------------------------
     token = get_admin_token()
 
     # -------------------------------
@@ -106,11 +103,13 @@ def create_user(
             f"{settings.KEYCLOAK_URL}/admin/realms/{settings.KEYCLOAK_REALM}/users",
             headers={"Authorization": f"Bearer {token}"},
             json={
-                "username": data["phone"],
+                "username": data.phone,
                 "enabled": True,
+                "firstName": data.first_name,
+                "lastName": data.last_name,
                 "credentials": [{
                     "type": "password",
-                    "value": data["password"],
+                    "value": default_password,
                     "temporary": False
                 }]
             },
@@ -136,30 +135,32 @@ def create_user(
     # -------------------------------
     # 3. Ensure Role Exists
     # -------------------------------
-    role_name = data["role"]
-
-    ensure_role(token, role_name)
+    ensure_role(token, data.role)
 
     # -------------------------------
     # 4. Assign Role in Keycloak
     # -------------------------------
-    assign_role(token, keycloak_id, role_name)
+    assign_role(token, keycloak_id, data.role)
 
     # -------------------------------
     # 5. Save in DB
     # -------------------------------
-    existing_user = db.query(User).filter(User.phone == data["phone"]).first()
+    existing_user = db.query(User).filter(User.phone == data.phone).first()
 
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
     user = User(
-        id=generate_user_id(db),
+        id=generate_enxu_id(db),
         keycloak_id=keycloak_id,
-        name=data["name"],
-        phone=data["phone"],
-        role=data["role"],  # POS role
-        location=data["location"]
+        first_name=data.first_name,
+        last_name=data.last_name,
+        dob=data.dob,
+        designation=data.designation,
+        role=data.role,
+        phone=data.phone,
+        location=data.location,
+        rating=0
     )
 
     db.add(user)
@@ -167,6 +168,7 @@ def create_user(
 
     return {
         "message": "User created successfully",
-        "user_id": user.id,
+        "enxu_id": user.id,
+        "default_password": default_password,
         "keycloak_id": keycloak_id
     }

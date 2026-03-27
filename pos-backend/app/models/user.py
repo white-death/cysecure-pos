@@ -1,17 +1,21 @@
-from sqlalchemy import Column, String, Date
+from sqlalchemy import Column, String, Integer, Date
+
 from app.db.base import Base
-from datetime import date
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True)  # ENXU2026000001
-    keycloak_id = Column(String, unique=True, index=True)
-    name = Column(String, nullable=False)
-    phone = Column(String, unique=True, nullable=False)
+    id = Column(String, primary_key=True)  # ENXU ID
+    keycloak_id = Column(String)
 
-    role = Column(String, nullable=False)  # admin, cashier, manager
-
+    first_name = Column(String)
+    last_name = Column(String)
     dob = Column(Date)
+
     designation = Column(String)
+    role = Column(String)
+
+    phone = Column(String, unique=True)
     location = Column(String)
+
+    rating = Column(Integer, default=0)  # ⭐ out of 5

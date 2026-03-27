@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  # Main Application Database
   postgres:
     image: postgres:15
     container_name: pos-postgres
@@ -12,6 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # PGAdmin (DB UI)
   pgadmin:
     image: dpage/pgadmin4
     container_name: pos-pgadmin
@@ -23,6 +25,7 @@ services:
     depends_on:
       - postgres
 
+  # FastAPI Backend
   backend:
     build:
       context: ./pos-backend
@@ -35,9 +38,21 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+      - keycloak
     volumes:
       - ./pos-backend:/app
 
+  # Keycloak Database (SEPARATE)
+  keycloak-db:
+    image: postgres:15
+    container_name: pos-keycloak-db
+    restart: always
+    env_file:
+      - ./pos-idp/keycloak-db.env
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+
+  # Keycloak Server
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.3
     container_name: pos-keycloak
@@ -47,6 +62,9 @@ services:
       - ./pos-idp/.env
     ports:
       - "8080:8080"
+    depends_on:
+      - keycloak-db
 
 volumes:
   postgres_data:
+  keycloak_data:

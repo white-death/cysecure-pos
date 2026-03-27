@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from datetime import date
 
-class UserCreate(BaseModel):
-    name: str
-    phone: str
-    password: str
-    role: str
+class CreateUserRequest(BaseModel):
+    first_name: str
+    last_name: str
     dob: date
     designation: str
+    role: str
+    phone: str
     location: str
