@@ -88,7 +88,7 @@ def create_user(
     - Stores full profile in DB
     """
 
-    default_password = "Temp@123"
+    default_password = "elan@123"
 
     # -------------------------------
     # Get admin token

@@ -1,19 +1,17 @@
 import requests
+from app.core.config import settings
 
 KEYCLOAK_URL = "http://keycloak:8080"
 REALM = "pos-realm"
-
-ADMIN_USERNAME = "administrator"
-ADMIN_PASSWORD = "pos@2026"
 
 
 def get_admin_token():
     url = f"{KEYCLOAK_URL}/realms/master/protocol/openid-connect/token"
 
     data = {
-        "client_id": "admin-cli",
-        "username": ADMIN_USERNAME,
-        "password": ADMIN_PASSWORD,
+        "client_id": settings.KEYCLOAK_ADMIN_CLIENT_ID,
+        "username": settings.KEYCLOAK_ADMIN_USERNAME,
+        "password": settings.KEYCLOAK_ADMIN_PASSWORD,
         "grant_type": "password"
     }
 
