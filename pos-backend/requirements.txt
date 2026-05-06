@@ -5,6 +5,7 @@ sqlalchemy
 psycopg2-binary
 python-jose[cryptography]
 pydantic
+alembic
 redis
 celery
 python-dotenv
