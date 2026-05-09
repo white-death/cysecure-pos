@@ -27,3 +27,10 @@ def generate_resource_id(resource_type: str, serial: int):
     type_code = PREFIX_MAP[resource_type.lower()]
 
     return f"EX{type_code}{year}{serial:04d}"
+
+
+def generate_customer_id(serial: int):
+
+    year = datetime.utcnow().year
+
+    return f"ENXC{year}{serial:06d}"

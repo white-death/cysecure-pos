@@ -1,11 +1,18 @@
 from fastapi import FastAPI
 
-# Database
+# DATABASE
 from app.db.init_db import init_db
 
-# Routes
+# ROUTES
 from app.api.routes import admin
-from app.api.routes.resources import router as resource_router
+
+from app.api.routes.resources import (
+    router as resource_router
+)
+
+from app.api.routes.customers import (
+    router as customer_router
+)
 
 app = FastAPI(
     title="CySecure POS Backend",
@@ -13,13 +20,13 @@ app = FastAPI(
 )
 
 
-# Create tables on startup
+# STARTUP
 @app.on_event("startup")
 def on_startup():
     init_db()
 
 
-# Root endpoint
+# ROOT
 @app.get("/")
 def root():
     return {
@@ -27,7 +34,7 @@ def root():
     }
 
 
-# Admin routes
+# ADMIN ROUTES
 app.include_router(
     admin.router,
     prefix="/admin",
@@ -35,7 +42,13 @@ app.include_router(
 )
 
 
-# Resource routes
+# RESOURCE ROUTES
 app.include_router(
     resource_router
+)
+
+
+# CUSTOMER ROUTES
+app.include_router(
+    customer_router
 )
