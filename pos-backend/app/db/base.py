@@ -5,3 +5,4 @@ Base = declarative_base()
 
 # Import all models here for Alembic detection
 from app.models.user import User
+from app.models.resource import Resource
