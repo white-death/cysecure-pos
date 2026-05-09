@@ -34,3 +34,10 @@ def generate_customer_id(serial: int):
     year = datetime.utcnow().year
 
     return f"ENXC{year}{serial:06d}"
+
+
+def generate_invoice_id(serial: int):
+
+    year = datetime.utcnow().year
+
+    return f"ENXI{year}{serial:06d}"

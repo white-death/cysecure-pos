@@ -14,6 +14,12 @@ from app.api.routes.customers import (
     router as customer_router
 )
 
+
+from app.api.routes.invoices import (
+    router as invoice_router
+)
+
+
 app = FastAPI(
     title="CySecure POS Backend",
     version="1.0.0"
@@ -51,4 +57,10 @@ app.include_router(
 # CUSTOMER ROUTES
 app.include_router(
     customer_router
+)
+
+
+# INVOICE ROUTES
+app.include_router(
+    invoice_router
 )
